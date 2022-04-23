@@ -44,6 +44,31 @@ router.get('/:id', async (req, res) => {
     }
 });
 
+// READING ALL ITEMS
+//GET ALL PRODUCTS
+router.get("/", async (req, res) => {
+    const qNew = req.query.new;
+    const qCategory = req.query.category;
+    try {
+        let items;
+
+        if (qNew) {
+            items = await Item.find().sort({ createdAt: -1 }).limit(1);
+        } else if (qCategory) {
+            items = await Item.find({
+                categories: {
+                    $in: [qCategory],
+                },
+            });
+        } else {
+            items = await Item.find();
+        }
+        res.status(200).json(items);
+    } catch (err) {
+        res.status(500).json(err);
+    }
+});
+
 // UPDATING ITEM
 router.patch('/:id', verifyTokenAuth, async (req, res) => {
     try {
