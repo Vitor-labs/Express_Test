@@ -36,7 +36,7 @@ router.get('/all', verifyTokenAndAdmin, async (req, res) => {
     }
 });
 
-router.get('/stats', verifyTokenAndAdmin, async (req, res) => {
+router.get('/stats', verifyTokenAndAdmin, async (res) => {
     try {
         const users = await User.find({})
         const stats = {
