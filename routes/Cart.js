@@ -5,13 +5,40 @@ const router = require("express").Router();
 
 //CREATING CART
 router.post("/", verifyToken, async (req, res) => {
-    const newCart = new Cart(req.body);
-
+    const cart = new Cart({
+        userId: req.user._id,
+        products: [
+            {
+                productId: req.body.productId,
+                quantity: req.body.quantity,
+            },
+        ],
+    });
     try {
-        const savedCart = await newCart.save();
-        res.status(200).json(savedCart);
+        const newCart = await cart.save();
+        res.status(201).json(newCart);
     } catch (err) {
-        res.status(500).json(err);
+        res.status(400).json({ message: err.message });
+    }
+});
+
+//READ USER CART
+router.get("/find/:userId", verifyTokenAuth, async (req, res) => {
+    try {
+        const cart = await Cart.findOne({ userId: req.params.userId });
+        res.json(cart);
+    } catch (err) {
+        res.status(500).json({ message: err.message });
+    }
+});
+
+//READ ALL CARTS
+router.get("/", verifyTokenAndAdmin, async (res) => {
+    try {
+        const carts = await Cart.find();
+        res.json(carts);
+    } catch (err) {
+        res.status(500).json({ message: err.message });
     }
 });
 
@@ -31,32 +58,11 @@ router.put("/:id", verifyTokenAuth, async (req, res) => {
     }
 });
 
-//DELETE
-router.delete("/:id", verifyTokenAndAuthorization, async (req, res) => {
+// DELETING CART
+router.delete("/:id", verifyTokenAuth, async (req, res) => {
     try {
         await Cart.findByIdAndDelete(req.params.id);
         res.status(200).json("Cart has been deleted...");
-    } catch (err) {
-        res.status(500).json(err);
-    }
-});
-
-//GET USER CART
-router.get("/find/:userId", verifyTokenAndAuthorization, async (req, res) => {
-    try {
-        const cart = await Cart.findOne({ userId: req.params.userId });
-        res.status(200).json(cart);
-    } catch (err) {
-        res.status(500).json(err);
-    }
-});
-
-// //GET ALL
-
-router.get("/", verifyTokenAndAdmin, async (req, res) => {
-    try {
-        const carts = await Cart.find();
-        res.status(200).json(carts);
     } catch (err) {
         res.status(500).json(err);
     }
