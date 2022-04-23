@@ -7,6 +7,7 @@ const dotenv = require('dotenv');
 
 const userRoutes = require('./routes/User');
 const authRoutes = require('./routes/auth');
+const itemRoutes = require('./routes/Items');
 
 dotenv.config();
 
@@ -27,6 +28,7 @@ app.use(express.json());
 
 app.use('/api/users', userRoutes);
 app.use('/api/auth', authRoutes);
+app.use('/api/items', itemRoutes);
 
 app.listen(process.env.port || 3000, () => {
     console.log("Server is running on port 3000");
